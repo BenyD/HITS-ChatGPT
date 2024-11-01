@@ -2,6 +2,7 @@
 
 # dependencies
 /node_modules
+/my_project_env
 /.pnp
 .pnp.*
 .yarn/*
@@ -38,4 +39,3 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
-my_project_env/
