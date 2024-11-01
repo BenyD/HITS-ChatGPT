@@ -1,0 +1,12 @@
+# Core requirements
+transformers==4.33.0  # or the latest version you prefer
+torch  # Will install the latest compatible version; specify if needed
+accelerate  # Required for training with transformers and PyTorch
+
+# Optional but likely needed
+datasets  # for handling dataset formats
+pymongo  # for MongoDB integration
+python-dotenv  # for loading environment variables from a .env file
+huggingface_hub  # for interacting with Hugging Face Hub
+scipy  # if you are doing similarity computations
+fitz
