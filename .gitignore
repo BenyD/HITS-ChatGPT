@@ -2,7 +2,7 @@
 
 # dependencies
 /node_modules
-/my_project_env
+my_project_env/
 /.pnp
 .pnp.*
 .yarn/*
