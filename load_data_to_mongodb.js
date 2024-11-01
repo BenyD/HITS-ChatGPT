@@ -25,16 +25,34 @@ async function loadData() {
     await client.connect();
     console.log("Connected to MongoDB successfully.");
 
-    const db = client.db("UniversityDB"); // Ensure this matches your database name
+    const db = client.db("UniversityDB");
     const collection = db.collection("contexts");
 
-    // Load data from JSON file
-    const data = JSON.parse(readFileSync("training_data.json", "utf-8"));
-    console.log("Loaded data from training_data.json.");
+    // Load data from formatted_training_data.txt
+    const data = readFileSync("formatted_training_data.txt", "utf-8").split(
+      "\n"
+    );
+    console.log("Loaded data from formatted_training_data.txt.");
 
-    // Prepare documents with embeddings for insertion
-    const documents = await Promise.all(
-      data.map(async (entry) => {
+    const documents = [];
+    let entry = { question: "", context: "", answer: "" };
+
+    // Parse each line of the text file
+    data.forEach((line) => {
+      if (line.startsWith("Question:")) {
+        entry.question = line.replace("Question:", "").trim();
+      } else if (line.startsWith("Context:")) {
+        entry.context = line.replace("Context:", "").trim();
+      } else if (line.startsWith("Answer:")) {
+        entry.answer = line.replace("Answer:", "").trim();
+        documents.push({ ...entry }); // Save the complete entry
+        entry = { question: "", context: "", answer: "" }; // Reset entry for the next block
+      }
+    });
+
+    // Process each document, add embeddings, and prepare for MongoDB insertion
+    const documentsWithEmbeddings = await Promise.all(
+      documents.map(async (entry) => {
         const embedding = await hf.featureExtraction({
           model: "sentence-transformers/all-MiniLM-L6-v2",
           inputs: entry.question,
@@ -43,24 +61,24 @@ async function loadData() {
         return {
           question: entry.question,
           context: entry.context,
-          embedding, // Save the embedding for similarity matching
+          answer: entry.answer,
+          embedding,
         };
       })
     );
 
-    // Clear existing documents (optional, for reloading data)
+    // Clear existing documents (optional)
     const deleteResult = await collection.deleteMany({});
     console.log(`Cleared ${deleteResult.deletedCount} existing documents.`);
 
     // Insert new documents with embeddings
-    const insertResult = await collection.insertMany(documents);
+    const insertResult = await collection.insertMany(documentsWithEmbeddings);
     console.log(
       `Inserted ${insertResult.insertedCount} new documents into MongoDB.`
     );
   } catch (error) {
     console.error("Error loading data:", error);
   } finally {
-    // Ensure the MongoDB client is closed
     await client.close();
     console.log("MongoDB connection closed.");
   }

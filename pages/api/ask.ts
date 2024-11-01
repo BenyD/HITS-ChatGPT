@@ -20,10 +20,9 @@ function cosineSimilarity(vectorA: number[], vectorB: number[]): number {
   const magnitudeB = Math.sqrt(
     vectorB.reduce((sum, val) => sum + val * val, 0)
   );
-  return magnitudeA && magnitudeB ? dotProduct / (magnitudeA * magnitudeB) : 0; // Avoid division by zero
+  return magnitudeA && magnitudeB ? dotProduct / (magnitudeA * magnitudeB) : 0;
 }
 
-// Get embedding for a question
 async function getEmbedding(question: string): Promise<number[]> {
   const embeddingResult = await hf.featureExtraction({
     model: "sentence-transformers/all-MiniLM-L6-v2",
@@ -32,7 +31,6 @@ async function getEmbedding(question: string): Promise<number[]> {
   return embeddingResult as number[];
 }
 
-// Find the most relevant context using cosine similarity
 async function findSimilarContext(question: string) {
   const db = await getDatabase();
   const collection = db.collection("contexts");
@@ -55,22 +53,18 @@ async function findSimilarContext(question: string) {
   return highestScore > 0.7 ? bestMatch?.context : null;
 }
 
-// Clean up the output to remove unwanted characters
 function cleanOutput(text: string): string {
-  return text.replace(/[^a-zA-Z0-9.,\s]/g, "").trim();
+  return text.replace(/(^.*Context:|Answer:|\\n)/g, "").trim();
 }
 
-// API handler for /api/ask
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
   if (req.method === "POST") {
     const { question } = req.body;
-
     console.log("Received question:", question);
 
-    // Find the most similar context from MongoDB
     const context = await findSimilarContext(question);
     if (!context) {
       return res.status(400).json({
@@ -82,9 +76,8 @@ export default async function handler(
     console.log("Using context:", context);
 
     try {
-      // Use the fine-tuned GPT-2 model for generating the response
       const response = await fetch(
-        "https://api-inference.huggingface.co/models/BenyD/College-ChatGPT",
+        "https://api-inference.huggingface.co/models/BenyD/Mistral-College-Chat",
         {
           method: "POST",
           headers: {
@@ -92,13 +85,12 @@ export default async function handler(
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            inputs: `You are a helpful assistant. Given the following context, answer the user's question.\n\nContext: ${context}\n\nQuestion: ${question}\nAnswer:`,
+            inputs: `Context: ${context}\nQuestion: ${question}\nAnswer:`,
             parameters: {
-              max_new_tokens: 100, // Limit the number of new tokens to avoid excessive characters
-              temperature: 0.3, // Lower temperature for more deterministic answers
+              max_new_tokens: 150,
+              temperature: 0.7,
               top_p: 0.9,
-              top_k: 50,
-              stop: ["\n", "Question:", "Context:"], // Stop generation at a logical boundary
+              stop: ["\n", "Question:", "Context:"],
             },
           }),
         }
@@ -107,12 +99,10 @@ export default async function handler(
       const data = await response.json();
       console.log("Model response:", data);
 
-      // Clean and extract the generated answer
       let answer =
         data[0]?.generated_text ||
         "I'm sorry, I couldn't retrieve a confident answer.";
-      answer = answer.split("Answer:")[1]?.trim() || answer; // Try to extract the part after 'Answer:'
-      answer = cleanOutput(answer); // Remove extraneous symbols and whitespace
+      answer = cleanOutput(answer);
 
       res.status(200).json({ answer });
     } catch (error) {
