@@ -2,6 +2,7 @@ import { NextApiRequest, NextApiResponse } from "next";
 import { MongoClient } from "mongodb";
 import { HfInference } from "@huggingface/inference";
 
+// Initialize Hugging Face Inference API and MongoDB URI
 const hf = new HfInference(process.env.HF_API_TOKEN as string);
 const uri = process.env.MONGODB_URI as string;
 
@@ -26,11 +27,10 @@ function cosineSimilarity(vectorA: number[], vectorB: number[]): number {
 
 // Generate embedding for the question
 async function getEmbedding(question: string): Promise<number[]> {
-  const embeddingResult = await hf.featureExtraction({
+  return (await hf.featureExtraction({
     model: "sentence-transformers/all-MiniLM-L6-v2",
     inputs: question,
-  });
-  return embeddingResult as number[];
+  })) as number[];
 }
 
 // Find similar context from MongoDB
@@ -52,7 +52,6 @@ async function findSimilarContext(question: string) {
   }
 
   console.log("Best similarity score:", highestScore);
-  console.log("Matched Context:", bestMatch?.context || "No context found");
   return highestScore > 0.3 ? bestMatch?.context : null;
 }
 
@@ -74,8 +73,6 @@ export default async function handler(
   console.log("Received question:", question);
 
   const context = await findSimilarContext(question);
-  console.log("Context found:", context);
-
   if (!context) {
     return res.status(200).json({
       answer:
@@ -86,11 +83,9 @@ export default async function handler(
   console.log("Using context:", context);
 
   try {
-    let response;
     const maxAttempts = 3;
-
     for (let attempt = 0; attempt < maxAttempts; attempt++) {
-      response = await fetch(
+      const response = await fetch(
         "https://api-inference.huggingface.co/models/BenyD/FLAN-T5-Small-College-Chat",
         {
           method: "POST",
@@ -99,25 +94,21 @@ export default async function handler(
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            inputs: `Question: List the names of the girls' hostels available. Context: ${context}. Answer concisely.`,
+            inputs: `Provide a comprehensive and detailed response. Question: ${question} Context: ${context}.`,
             parameters: {
-              max_new_tokens: 100,
-              temperature: 0.7,
-              top_p: 0.9,
+              max_new_tokens: 150,
+              temperature: 0.5,
+              top_p: 0.85,
             },
           }),
         }
       );
 
       const data = await response.json();
-      console.log("Model response data:", data);
-
       if (data.error) {
         if (data.error.includes("currently loading")) {
           console.log(
-            `Model is loading. Retrying in 5 seconds... (Attempt ${
-              attempt + 1
-            }/${maxAttempts})`
+            `Model loading. Retrying... (Attempt ${attempt + 1}/${maxAttempts})`
           );
           await new Promise((resolve) => setTimeout(resolve, 5000));
           continue;
@@ -128,28 +119,27 @@ export default async function handler(
               "I'm sorry, I couldn't retrieve a detailed answer. Please try again later.",
           });
         }
-      } else if (data[0]?.generated_text) {
-        let answer = cleanOutput(data[0].generated_text);
+      }
 
-        // Fallback to context if answer seems too generic or unrelated
+      if (data[0]?.generated_text) {
+        let answer = cleanOutput(data[0].generated_text);
         if (
           !answer ||
           answer.length < 5 ||
           !answer.includes(context.split(",")[0])
         ) {
           console.log("Using fallback answer based on context.");
-          answer = context;
+          answer = `The following information might be useful: ${context}.`;
         }
-
         console.log("Final Answer:", answer);
         return res.status(200).json({ answer });
-      } else {
-        console.log("Unexpected response format:", data);
-        return res.status(200).json({
-          answer:
-            "I'm sorry, I couldn't retrieve a detailed answer. Please try again later.",
-        });
       }
+
+      console.log("Unexpected response format:", data);
+      return res.status(200).json({
+        answer:
+          "I'm sorry, I couldn't retrieve a detailed answer. Please try again later.",
+      });
     }
 
     return res.status(200).json({

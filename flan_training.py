@@ -38,8 +38,8 @@ dataset = Dataset.from_dict({
 })
 
 # Initialize tokenizer and model with token
-tokenizer = T5Tokenizer.from_pretrained(model_name, use_auth_token=hf_api_token)
-model = T5ForConditionalGeneration.from_pretrained(model_name, use_auth_token=hf_api_token).to(device)
+tokenizer = T5Tokenizer.from_pretrained(model_name, token=hf_api_token)
+model = T5ForConditionalGeneration.from_pretrained(model_name, token=hf_api_token).to(device)
 
 # Tokenize and format data for training
 def preprocess(data):
@@ -58,6 +58,7 @@ training_args = TrainingArguments(
     save_steps=500,
     save_total_limit=1,
     logging_steps=10,
+    evaluation_strategy="no"  # Disable evaluation during training
 )
 
 # Initialize Trainer for fine-tuning
@@ -75,7 +76,7 @@ trainer.save_model("./flan_t5_college_chat_model")
 tokenizer.save_pretrained("./flan_t5_college_chat_model")
 
 # Push to Hugging Face Hub
-model.push_to_hub("BenyD/FLAN-T5-Small-College-Chat", use_auth_token=hf_api_token)
-tokenizer.push_to_hub("BenyD/FLAN-T5-Small-College-Chat", use_auth_token=hf_api_token)
+model.push_to_hub("BenyD/FLAN-T5-Small-College-Chat", token=hf_api_token)
+tokenizer.push_to_hub("BenyD/FLAN-T5-Small-College-Chat", token=hf_api_token)
 
 logger.info("Model and tokenizer have been uploaded to Hugging Face.")
