@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 
 import { useState } from "react";
@@ -7,6 +8,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Send, Plus, Copy } from "lucide-react";
 import NextImage from "next/image";
 import { ModeToggle } from "@/components/ui/mode-toggle"; // Import ModeToggle
+import { useTheme } from "next-themes"; // Import the theme hook
 import {
   AlertDialog,
   AlertDialogAction,
@@ -28,6 +30,7 @@ export default function Component() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState<string>("");
   const [isExpanded, setIsExpanded] = useState<boolean>(false);
+  const { theme } = useTheme();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -86,17 +89,17 @@ export default function Component() {
   return (
     <div className="flex flex-col min-h-screen">
       <header className="sticky top-0 z-50 bg-white dark:bg-[#202123] border-b border-gray-200 dark:border-gray-700">
-        <div className="flex justify-between items-center px-4 py-3 max-w-[1920px] mx-auto">
-          <div className="flex items-center gap-3">
-            <NextImage
-              src="/hits.svg"
-              alt="University Logo"
-              width={256}
-              height={256}
-              className=""
-            />
+        <div className="flex justify-center items-center px-4 py-3 max-w-[1920px] mx-auto">
+          <NextImage
+            src={theme === "dark" ? "/hits-dark.svg" : "/hits-light.svg"}
+            alt="University Logo"
+            width={256}
+            height={256}
+            className=""
+          />
+          <div className="absolute right-4">
+            <ModeToggle />
           </div>
-          <ModeToggle /> {/* Replace with ModeToggle component */}
         </div>
       </header>
 
