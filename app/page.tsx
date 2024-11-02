@@ -158,10 +158,10 @@ export default function Component() {
                 ))}
               </div>
             </ScrollArea>
-            <div className="fixed bottom-0 w-full max-w-4xl mx-auto px-4 py-4 ">
+            <div className="flex w-full max-w-4xl mx-auto px-4 py-4 items-center justify-center gap-2 fixed bottom-0">
               <form
                 onSubmit={handleSubmit}
-                className="relative flex items-center"
+                className="relative flex-grow flex items-center"
               >
                 <Input
                   type="text"
@@ -179,41 +179,40 @@ export default function Component() {
                   <span className="sr-only">Send</span>
                 </Button>
               </form>
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button
+                    className="w-12 h-12 bg-black hover:bg-neutral-800 dark:bg-white dark:hover:bg-gray-200 text-white dark:text-black rounded-full"
+                    size="icon"
+                  >
+                    <Plus className="h-6 w-6" />
+                    <span className="sr-only">New Chat</span>
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent className="bg-white dark:bg-neutral-900 border border-gray-200 dark:border-neutral-700">
+                  <AlertDialogHeader>
+                    <AlertDialogTitle className="text-gray-900 dark:text-gray-100">
+                      Start a New Chat?
+                    </AlertDialogTitle>
+                    <AlertDialogDescription className="text-gray-500 dark:text-gray-400">
+                      Starting a new chat will delete the current conversation.
+                      This action cannot be undone.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel className="border border-gray-200 dark:border-neutral-700">
+                      Cancel
+                    </AlertDialogCancel>
+                    <AlertDialogAction onClick={startNewChat}>
+                      Continue
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
             </div>
           </>
         )}
       </main>
-
-      <AlertDialog>
-        <AlertDialogTrigger asChild>
-          <Button
-            className="fixed bottom-4 right-4 rounded-full w-12 h-12 bg-black hover:bg-neutral-800 dark:bg-white dark:hover:bg-gray-200 text-white dark:text-black"
-            size="icon"
-          >
-            <Plus className="h-6 w-6" />
-            <span className="sr-only">New Chat</span>
-          </Button>
-        </AlertDialogTrigger>
-        <AlertDialogContent className="bg-white dark:bg-neutral-900 border border-gray-200 dark:border-neutral-700">
-          <AlertDialogHeader>
-            <AlertDialogTitle className="text-gray-900 dark:text-gray-100">
-              Start a New Chat?
-            </AlertDialogTitle>
-            <AlertDialogDescription className="text-gray-500 dark:text-gray-400">
-              Starting a new chat will delete the current conversation. This
-              action cannot be undone.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel className="border border-gray-200 dark:border-neutral-700">
-              Cancel
-            </AlertDialogCancel>
-            <AlertDialogAction onClick={startNewChat}>
-              Continue
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
     </div>
   );
 }
