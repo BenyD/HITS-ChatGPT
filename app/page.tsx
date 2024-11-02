@@ -88,7 +88,7 @@ export default function Component() {
 
   return (
     <div className="flex flex-col min-h-screen">
-      <header className="sticky top-0 z-50 bg-white dark:bg-[#202123] border-b border-gray-200 dark:border-gray-700">
+      <header className="sticky top-0 z-50 bg-white dark:bg-neutral-900 border-b border-gray-200 dark:border-neutral-700">
         <div className="flex justify-center items-center px-4 py-3 max-w-[1920px] mx-auto">
           <NextImage
             src={theme === "dark" ? "/hits-dark.svg" : "/hits-light.svg"}
@@ -107,25 +107,21 @@ export default function Component() {
         {!isExpanded ? (
           <div className="flex-1 flex flex-col items-center justify-center gap-4 p-4 md:p-8 max-w-[1920px] mx-auto w-full">
             <h2 className="text-2xl sm:text-3xl font-semibold text-gray-800 dark:text-gray-100">
-              What can I help with?
+              How can I assist you?
             </h2>
             <form onSubmit={handleSubmit} className="w-full max-w-2xl mb-8">
-              <div className="relative flex items-center space-x-2">
+              <div className="relative flex items-center">
                 <Input
                   type="text"
-                  placeholder="Message UniChat..."
+                  placeholder="Type your message here..."
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
-                  className="flex-grow pl-4 pr-12 py-4 h-14 bg-gray-100 dark:bg-[#40414f] border border-gray-300 dark:border-gray-600 focus-visible:ring-2 focus-visible:ring-gray-300 dark:focus-visible:ring-gray-600 rounded-2xl"
+                  className="flex-grow pl-4 pr-10 py-4 h-14 bg-gray-100 dark:bg-neutral-900 border border-gray-300 dark:border-neutral-700 focus-visible:ring-2 focus-visible:ring-gray-300 dark:focus-visible:ring-neutral-700 rounded-2xl"
                 />
-                <Button
-                  type="submit"
-                  size="icon"
-                  className="h-10 w-10 rounded-full bg-black text-white dark:bg-white dark:text-black"
-                >
-                  <Send className="h-5 w-5" />
+                <button type="submit" className="absolute right-3">
+                  <Send className="h-5 w-5 text-gray-700 dark:text-neutral-300" />
                   <span className="sr-only">Send</span>
-                </Button>
+                </button>
               </div>
             </form>
           </div>
@@ -143,8 +139,8 @@ export default function Component() {
                     <div
                       className={`${
                         message.role === "user"
-                          ? "bg-gray-100 dark:bg-[#40414F] rounded-3xl px-6 py-3 max-w-[90%] md:max-w-[80%] border border-gray-300 dark:border-gray-600"
-                          : "max-w-3xl mx-auto border border-gray-300 dark:border-gray-600 px-6 py-3 rounded-3xl"
+                          ? "bg-gray-100 dark:bg-neutral-800 rounded-3xl px-6 py-3 max-w-[90%] md:max-w-[80%] border border-gray-300 dark:border-neutral-700"
+                          : "max-w-3xl mx-auto border border-gray-300 dark:border-neutral-700 px-6 py-3 rounded-3xl"
                       }`}
                     >
                       <div className="prose dark:prose-invert max-w-none">
@@ -154,7 +150,7 @@ export default function Component() {
                         <div className="flex items-center gap-3 mt-2 text-gray-400">
                           <button
                             onClick={() => copyToClipboard(message.content)}
-                            className="hover:text-gray-700 dark:hover:text-gray-200 transition-colors"
+                            className="hover:text-gray-700 dark:hover:text-neutral-300 transition-colors"
                           >
                             <Copy className="h-4 w-4" />
                           </button>
@@ -168,23 +164,19 @@ export default function Component() {
             <div className="max-w-3xl mx-auto lg:max-w-4xl xl:max-w-5xl px-4 py-4">
               <form
                 onSubmit={handleSubmit}
-                className="relative flex items-center space-x-2"
+                className="relative flex items-center"
               >
                 <Input
                   type="text"
-                  placeholder="Message UniChat..."
+                  placeholder="Type your message here..."
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
-                  className="flex-grow pl-4 pr-12 py-4 h-14 bg-gray-100 dark:bg-[#40414f] border border-gray-300 dark:border-gray-600 focus-visible:ring-2 focus-visible:ring-gray-300 dark:focus-visible:ring-gray-600 rounded-2xl"
+                  className="flex-grow pl-4 pr-10 py-4 h-14 bg-gray-100 dark:bg-neutral-900 border border-gray-300 dark:border-neutral-700 focus-visible:ring-2 focus-visible:ring-gray-300 dark:focus-visible:ring-neutral-700 rounded-2xl"
                 />
-                <Button
-                  type="submit"
-                  size="icon"
-                  className="h-10 w-10 rounded-full bg-black text-white dark:bg-white dark:text-black"
-                >
-                  <Send className="h-5 w-5" />
+                <button type="submit" className="absolute right-3">
+                  <Send className="h-5 w-5 text-gray-700 dark:text-neutral-300" />
                   <span className="sr-only">Send</span>
-                </Button>
+                </button>
               </form>
             </div>
           </>
@@ -194,25 +186,25 @@ export default function Component() {
       <AlertDialog>
         <AlertDialogTrigger asChild>
           <Button
-            className="fixed bottom-4 right-4 rounded-full w-12 h-12 bg-black hover:bg-gray-800 dark:bg-white dark:hover:bg-gray-200 text-white dark:text-black"
+            className="fixed bottom-4 right-4 rounded-full w-12 h-12 bg-black hover:bg-gray-800 dark:bg-white dark:hover:bg-neutral-200 text-white dark:text-black"
             size="icon"
           >
             <Plus className="h-6 w-6" />
             <span className="sr-only">New Chat</span>
           </Button>
         </AlertDialogTrigger>
-        <AlertDialogContent className="bg-white dark:bg-[#2a2b32] border border-gray-200 dark:border-gray-700">
+        <AlertDialogContent className="bg-white dark:bg-neutral-900 border border-gray-200 dark:border-neutral-700">
           <AlertDialogHeader>
             <AlertDialogTitle className="text-gray-900 dark:text-gray-100">
               Start a New Chat?
             </AlertDialogTitle>
-            <AlertDialogDescription className="text-gray-500 dark:text-gray-400">
+            <AlertDialogDescription className="text-gray-500 dark:text-neutral-400">
               Starting a new chat will delete the current conversation. This
               action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel className="border border-gray-200 dark:border-gray-700">
+            <AlertDialogCancel className="border border-gray-200 dark:border-neutral-700">
               Cancel
             </AlertDialogCancel>
             <AlertDialogAction onClick={startNewChat}>
@@ -222,7 +214,7 @@ export default function Component() {
         </AlertDialogContent>
       </AlertDialog>
 
-      <footer className="py-2 text-center text-xs text-gray-400 dark:text-gray-500">
+      <footer className="py-2 text-center text-xs text-gray-400 dark:text-neutral-500">
         <p>
           © 2024 Hindustan Institute of Technology and Science. All rights
           reserved.
