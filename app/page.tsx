@@ -1,13 +1,12 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Send, Plus, Copy } from "lucide-react";
 import NextImage from "next/image";
-import { ModeToggle } from "@/components/ui/mode-toggle";
-
+import { ModeToggle } from "@/components/ui/mode-toggle"; // Import ModeToggle
 import {
   AlertDialog,
   AlertDialogAction,
@@ -88,9 +87,7 @@ export default function Component() {
     <div className="flex flex-col min-h-screen">
       <header className="sticky top-0 z-50 bg-white dark:bg-[#202123] border-b border-gray-200 dark:border-gray-700">
         <div className="flex justify-between items-center px-4 py-3 max-w-[1920px] mx-auto">
-          <div className="flex items-center gap-3 mx-auto">
-            {" "}
-            {/* Center align logo */}
+          <div className="flex items-center gap-3">
             <NextImage
               src="/hits.svg"
               alt="University Logo"
@@ -99,7 +96,7 @@ export default function Component() {
               className=""
             />
           </div>
-          <ModeToggle /> {/* Add the ModeToggle component here */}
+          <ModeToggle /> {/* Replace with ModeToggle component */}
         </div>
       </header>
 
@@ -109,23 +106,19 @@ export default function Component() {
             <h2 className="text-2xl sm:text-3xl font-semibold text-gray-800 dark:text-gray-100">
               What can I help with?
             </h2>
-            <form onSubmit={handleSubmit} className="w-3/4 mb-8">
-              {" "}
-              {/* Adjusted to 75% width */}
-              <div className="relative">
+            <form onSubmit={handleSubmit} className="w-full max-w-2xl mb-8">
+              <div className="relative flex items-center space-x-2">
                 <Input
                   type="text"
                   placeholder="Message UniChat..."
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
-                  className="w-full pl-4 pr-12 py-4 h-14 bg-gray-100 dark:bg-[#40414f] border border-gray-300 dark:border-gray-600 focus-visible:ring-2 focus-visible:ring-gray-300 dark:focus-visible:ring-gray-600 rounded-2xl"
+                  className="flex-grow pl-4 pr-12 py-4 h-14 bg-gray-100 dark:bg-[#40414f] border border-gray-300 dark:border-gray-600 focus-visible:ring-2 focus-visible:ring-gray-300 dark:focus-visible:ring-gray-600 rounded-2xl"
                 />
                 <Button
                   type="submit"
                   size="icon"
-                  className={`absolute right-2 top-2 h-10 w-10 rounded-full ${
-                    isExpanded ? "bg-white text-black" : "bg-black text-white"
-                  }`}
+                  className="h-10 w-10 rounded-full bg-black text-white dark:bg-white dark:text-black"
                 >
                   <Send className="h-5 w-5" />
                   <span className="sr-only">Send</span>
@@ -172,21 +165,19 @@ export default function Component() {
             <div className="max-w-3xl mx-auto lg:max-w-4xl xl:max-w-5xl px-4 py-4">
               <form
                 onSubmit={handleSubmit}
-                className="relative w-3/4 mx-auto" // Adjusted to 75% width
+                className="relative flex items-center space-x-2"
               >
                 <Input
                   type="text"
                   placeholder="Message UniChat..."
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
-                  className="w-full pl-4 pr-12 py-4 h-14 bg-gray-100 dark:bg-[#40414f] border border-gray-300 dark:border-gray-600 focus-visible:ring-2 focus-visible:ring-gray-300 dark:focus-visible:ring-gray-600 rounded-2xl"
+                  className="flex-grow pl-4 pr-12 py-4 h-14 bg-gray-100 dark:bg-[#40414f] border border-gray-300 dark:border-gray-600 focus-visible:ring-2 focus-visible:ring-gray-300 dark:focus-visible:ring-gray-600 rounded-2xl"
                 />
                 <Button
                   type="submit"
                   size="icon"
-                  className={`absolute right-2 top-2 h-10 w-10 rounded-full ${
-                    isExpanded ? "bg-white text-black" : "bg-black text-white"
-                  }`}
+                  className="h-10 w-10 rounded-full bg-black text-white dark:bg-white dark:text-black"
                 >
                   <Send className="h-5 w-5" />
                   <span className="sr-only">Send</span>
