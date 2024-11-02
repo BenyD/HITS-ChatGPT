@@ -4,8 +4,10 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Send, Plus, Copy, Sun, Moon } from "lucide-react";
+import { Send, Plus, Copy } from "lucide-react";
 import NextImage from "next/image";
+import { ModeToggle } from "@/components/ui/mode-toggle";
+
 import {
   AlertDialog,
   AlertDialogAction,
@@ -27,16 +29,6 @@ export default function Component() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState<string>("");
   const [isExpanded, setIsExpanded] = useState<boolean>(false);
-  const [isDark, setIsDark] = useState<boolean>(false);
-
-  useEffect(() => {
-    const root = document.documentElement;
-    if (isDark) {
-      root.classList.add("dark");
-    } else {
-      root.classList.remove("dark");
-    }
-  }, [isDark]);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -69,7 +61,6 @@ export default function Component() {
             },
           ]);
         }
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
       } catch (error) {
         setMessages((prev) => [
           ...prev,
@@ -94,10 +85,12 @@ export default function Component() {
   };
 
   return (
-    <div className={`flex flex-col min-h-screen ${isDark ? "dark" : ""}`}>
+    <div className="flex flex-col min-h-screen">
       <header className="sticky top-0 z-50 bg-white dark:bg-[#202123] border-b border-gray-200 dark:border-gray-700">
         <div className="flex justify-between items-center px-4 py-3 max-w-[1920px] mx-auto">
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 mx-auto">
+            {" "}
+            {/* Center align logo */}
             <NextImage
               src="/hits.svg"
               alt="University Logo"
@@ -106,18 +99,7 @@ export default function Component() {
               className=""
             />
           </div>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => setIsDark(!isDark)}
-            className="w-10 h-10 rounded-lg bg-black hover:bg-gray-800 dark:bg-white dark:hover:bg-gray-200 text-white dark:text-black"
-          >
-            {isDark ? (
-              <Sun className="h-6 w-6" />
-            ) : (
-              <Moon className="h-6 w-6" />
-            )}
-          </Button>
+          <ModeToggle /> {/* Add the ModeToggle component here */}
         </div>
       </header>
 
@@ -127,7 +109,9 @@ export default function Component() {
             <h2 className="text-2xl sm:text-3xl font-semibold text-gray-800 dark:text-gray-100">
               What can I help with?
             </h2>
-            <form onSubmit={handleSubmit} className="w-full max-w-2xl mb-8">
+            <form onSubmit={handleSubmit} className="w-3/4 mb-8">
+              {" "}
+              {/* Adjusted to 75% width */}
               <div className="relative">
                 <Input
                   type="text"
@@ -140,7 +124,7 @@ export default function Component() {
                   type="submit"
                   size="icon"
                   className={`absolute right-2 top-2 h-10 w-10 rounded-full ${
-                    isDark ? "bg-white text-black" : "bg-black text-white"
+                    isExpanded ? "bg-white text-black" : "bg-black text-white"
                   }`}
                 >
                   <Send className="h-5 w-5" />
@@ -188,7 +172,7 @@ export default function Component() {
             <div className="max-w-3xl mx-auto lg:max-w-4xl xl:max-w-5xl px-4 py-4">
               <form
                 onSubmit={handleSubmit}
-                className="relative max-w-2xl mx-auto"
+                className="relative w-3/4 mx-auto" // Adjusted to 75% width
               >
                 <Input
                   type="text"
@@ -201,7 +185,7 @@ export default function Component() {
                   type="submit"
                   size="icon"
                   className={`absolute right-2 top-2 h-10 w-10 rounded-full ${
-                    isDark ? "bg-white text-black" : "bg-black text-white"
+                    isExpanded ? "bg-white text-black" : "bg-black text-white"
                   }`}
                 >
                   <Send className="h-5 w-5" />
