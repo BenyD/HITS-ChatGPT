@@ -127,11 +127,17 @@ export default function Component() {
                 </Button>
               </div>
             </form>
+            <footer className="py-2 text-center text-xs text-gray-400 dark:text-gray-500">
+              <p>
+                © 2024 Hindustan Institute of Technology and Science. All rights
+                reserved.
+              </p>
+            </footer>
           </div>
         ) : (
           <>
             <ScrollArea className="flex-1 w-full max-w-4xl mx-auto px-4 py-6">
-              <div className="space-y-4">
+              <div className="space-y-4 pb-20">
                 {messages.map((message, index) => (
                   <div
                     key={index}
@@ -152,7 +158,7 @@ export default function Component() {
                 ))}
               </div>
             </ScrollArea>
-            <div className="w-full max-w-4xl mx-auto px-4 py-4">
+            <div className="fixed bottom-0 w-full max-w-4xl mx-auto px-4 py-4 ">
               <form
                 onSubmit={handleSubmit}
                 className="relative flex items-center"
@@ -208,13 +214,6 @@ export default function Component() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-
-      <footer className="py-2 text-center text-xs text-gray-400 dark:text-gray-500">
-        <p>
-          © 2024 Hindustan Institute of Technology and Science. All rights
-          reserved.
-        </p>
-      </footer>
     </div>
   );
 }
