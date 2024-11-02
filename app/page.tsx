@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Send, Plus, Copy } from "lucide-react";
+import { Send, Plus, Loader } from "lucide-react";
 import NextImage from "next/image";
 import { ModeToggle } from "@/components/ui/mode-toggle";
 import { useTheme } from "next-themes";
@@ -28,61 +28,57 @@ type Message = {
 export default function Component() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState<string>("");
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isExpanded, setIsExpanded] = useState<boolean>(false);
   const { theme } = useTheme();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (input.trim()) {
-      setMessages((prev) => [...prev, { role: "user", content: input }]);
-      setIsExpanded(true);
+    if (!input.trim()) return; // Prevent empty submissions
 
-      try {
-        const response = await fetch("/api/ask", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            question: input,
-            context: "Provide any necessary context here",
-          }),
-        });
-        const data = await response.json();
+    // Add user message and show loading spinner
+    setMessages((prev) => [...prev, { role: "user", content: input }]);
+    setIsExpanded(true);
+    setIsLoading(true);
+    setInput("");
 
-        if (data.answer) {
-          setMessages((prev) => [
-            ...prev,
-            { role: "bot", content: data.answer },
-          ]);
-        } else {
-          setMessages((prev) => [
-            ...prev,
-            {
-              role: "bot",
-              content: "I couldn't find an answer. Please try again.",
-            },
-          ]);
-        }
-      } catch (error) {
-        setMessages((prev) => [
-          ...prev,
-          {
-            role: "bot",
-            content: "Error occurred while fetching the response.",
-          },
-        ]);
-      }
+    try {
+      // Fetch response from API
+      const response = await fetch("/api/ask", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ question: input }),
+      });
 
-      setInput("");
+      const data = await response.json();
+
+      // Handle response and display message from bot
+      setMessages((prev) => [
+        ...prev,
+        {
+          role: "bot",
+          content:
+            data.answer ||
+            "I'm sorry, I couldn't find an answer. Please try again or ask something else.",
+        },
+      ]);
+    } catch (error) {
+      console.error("Error occurred while fetching response:", error);
+      setMessages((prev) => [
+        ...prev,
+        {
+          role: "bot",
+          content: "An error occurred. Please try again later.",
+        },
+      ]);
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const startNewChat = () => {
     setMessages([]);
     setIsExpanded(false);
-  };
-
-  const copyToClipboard = (text: string) => {
-    navigator.clipboard.writeText(text);
   };
 
   return (
@@ -94,7 +90,6 @@ export default function Component() {
             alt="University Logo"
             width={256}
             height={256}
-            className=""
           />
           <div className="absolute right-4">
             <ModeToggle />
@@ -120,9 +115,14 @@ export default function Component() {
                 <Button
                   type="submit"
                   size="icon"
+                  disabled={isLoading} // Disable button while loading
                   className="absolute right-3 top-1/2 transform -translate-y-1/2 bg-black text-white dark:bg-white dark:text-black rounded-full"
                 >
-                  <Send className="h-5 w-5" />
+                  {isLoading ? (
+                    <Loader className="h-5 w-5 animate-spin" />
+                  ) : (
+                    <Send className="h-5 w-5" />
+                  )}
                   <span className="sr-only">Send</span>
                 </Button>
               </div>
@@ -156,8 +156,14 @@ export default function Component() {
                     </div>
                   </div>
                 ))}
+                {isLoading && (
+                  <div className="text-center mt-2">
+                    <Loader className="h-6 w-6 animate-spin" />
+                  </div>
+                )}
               </div>
             </ScrollArea>
+
             <div className="flex w-full max-w-4xl mx-auto px-4 py-4 items-center justify-center gap-2 fixed bottom-0">
               <form
                 onSubmit={handleSubmit}
@@ -168,17 +174,24 @@ export default function Component() {
                   placeholder="Type your message here..."
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
+                  disabled={isLoading}
                   className="w-full pl-4 pr-12 py-4 h-14 bg-gray-100 dark:bg-neutral-800 border border-gray-300 dark:border-neutral-700 focus-visible:ring-2 focus-visible:ring-gray-300 dark:focus-visible:ring-neutral-700 rounded-2xl"
                 />
                 <Button
                   type="submit"
                   size="icon"
+                  disabled={isLoading}
                   className="absolute right-3 top-1/2 transform -translate-y-1/2 bg-black text-white dark:bg-white dark:text-black"
                 >
-                  <Send className="h-5 w-5" />
+                  {isLoading ? (
+                    <Loader className="h-5 w-5 animate-spin" />
+                  ) : (
+                    <Send className="h-5 w-5" />
+                  )}
                   <span className="sr-only">Send</span>
                 </Button>
               </form>
+
               <AlertDialog>
                 <AlertDialogTrigger asChild>
                   <Button

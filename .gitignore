@@ -3,6 +3,7 @@
 # dependencies
 /node_modules
 my_project_env/
+flan_t5_college_chat_model/
 /.pnp
 .pnp.*
 .yarn/*

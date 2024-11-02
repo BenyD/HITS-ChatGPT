@@ -28,27 +28,26 @@ async function loadData() {
     const db = client.db("UniversityDB");
     const collection = db.collection("contexts");
 
-    // Load data from formatted_training_data.txt
-    const data = readFileSync("formatted_training_data.txt", "utf-8").split(
-      "\n"
-    );
-    console.log("Loaded data from formatted_training_data.txt.");
+    // Load data from dataset.json
+    const rawData = readFileSync("dataset.json", "utf-8").split("\n");
+    console.log("Loaded data from dataset.json.");
 
-    const documents = [];
-    let entry = { question: "", context: "", answer: "" };
+    const documents = rawData
+      .map((line) => {
+        line = line.trim(); // Remove any leading/trailing whitespace
+        if (line) {
+          try {
+            return JSON.parse(line);
+          } catch (error) {
+            console.error("Invalid JSON line skipped:", line, error.message);
+            return null;
+          }
+        }
+        return null; // Skip empty lines
+      })
+      .filter((entry) => entry !== null); // Remove null entries
 
-    // Parse each line of the text file
-    data.forEach((line) => {
-      if (line.startsWith("Question:")) {
-        entry.question = line.replace("Question:", "").trim();
-      } else if (line.startsWith("Context:")) {
-        entry.context = line.replace("Context:", "").trim();
-      } else if (line.startsWith("Answer:")) {
-        entry.answer = line.replace("Answer:", "").trim();
-        documents.push({ ...entry }); // Save the complete entry
-        entry = { question: "", context: "", answer: "" }; // Reset entry for the next block
-      }
-    });
+    console.log(`Parsed ${documents.length} valid entries from dataset.json.`);
 
     // Process each document, add embeddings, and prepare for MongoDB insertion
     const documentsWithEmbeddings = await Promise.all(
