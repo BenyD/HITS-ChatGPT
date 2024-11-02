@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 
 import { useState } from "react";
@@ -7,8 +6,8 @@ import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Send, Plus, Copy } from "lucide-react";
 import NextImage from "next/image";
-import { ModeToggle } from "@/components/ui/mode-toggle"; // Import ModeToggle
-import { useTheme } from "next-themes"; // Import the theme hook
+import { ModeToggle } from "@/components/ui/mode-toggle";
+import { useTheme } from "next-themes";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -103,65 +102,57 @@ export default function Component() {
         </div>
       </header>
 
-      <main className="flex-1 w-full flex flex-col">
+      <main className="flex-1 w-full flex flex-col items-center justify-center">
         {!isExpanded ? (
-          <div className="flex-1 flex flex-col items-center justify-center gap-4 p-4 md:p-8 max-w-[1920px] mx-auto w-full">
-            <h2 className="text-2xl sm:text-3xl font-semibold text-gray-800 dark:text-gray-100">
+          <div className="flex flex-col items-center justify-center gap-6 p-4 md:p-8 w-full max-w-4xl mx-auto">
+            <h2 className="text-2xl sm:text-3xl font-semibold text-gray-800 dark:text-gray-100 text-center">
               How can I assist you?
             </h2>
-            <form onSubmit={handleSubmit} className="w-full max-w-2xl mb-8">
+            <form onSubmit={handleSubmit} className="w-full max-w-2xl">
               <div className="relative flex items-center">
                 <Input
                   type="text"
                   placeholder="Type your message here..."
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
-                  className="flex-grow pl-4 pr-10 py-4 h-14 bg-gray-100 dark:bg-neutral-900 border border-gray-300 dark:border-neutral-700 focus-visible:ring-2 focus-visible:ring-gray-300 dark:focus-visible:ring-neutral-700 rounded-2xl"
+                  className="flex-grow pl-4 pr-12 py-4 h-14 bg-gray-100 dark:bg-neutral-800 border border-gray-300 dark:border-neutral-700 focus-visible:ring-2 focus-visible:ring-gray-300 dark:focus-visible:ring-neutral-700 rounded-2xl"
                 />
-                <button type="submit" className="absolute right-3">
-                  <Send className="h-5 w-5 text-gray-700 dark:text-neutral-300" />
+                <Button
+                  type="submit"
+                  size="icon"
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 bg-black text-white dark:bg-white dark:text-black rounded-full"
+                >
+                  <Send className="h-5 w-5" />
                   <span className="sr-only">Send</span>
-                </button>
+                </Button>
               </div>
             </form>
           </div>
         ) : (
           <>
-            <ScrollArea className="flex-1">
-              <div className="max-w-3xl mx-auto lg:max-w-4xl xl:max-w-6xl px-6 py-6">
+            <ScrollArea className="flex-1 w-full max-w-4xl mx-auto px-4 py-6">
+              <div className="space-y-4">
                 {messages.map((message, index) => (
                   <div
                     key={index}
-                    className={`px-4 ${
-                      message.role === "user" ? "flex justify-end my-4" : "py-8"
+                    className={`${
+                      message.role === "user" ? "text-right" : "text-left"
                     }`}
                   >
                     <div
-                      className={`${
+                      className={`inline-block ${
                         message.role === "user"
-                          ? "bg-gray-100 dark:bg-neutral-800 rounded-3xl px-6 py-3 max-w-[90%] md:max-w-[80%] border border-gray-300 dark:border-neutral-700"
-                          : "max-w-3xl mx-auto border border-gray-300 dark:border-neutral-700 px-6 py-3 rounded-3xl"
-                      }`}
+                          ? "bg-gray-100 dark:bg-neutral-800"
+                          : "bg-neutral-200 dark:bg-neutral-700"
+                      } p-4 rounded-lg max-w-[90%]`}
                     >
-                      <div className="prose dark:prose-invert max-w-none">
-                        {message.content}
-                      </div>
-                      {message.role === "bot" && (
-                        <div className="flex items-center gap-3 mt-2 text-gray-400">
-                          <button
-                            onClick={() => copyToClipboard(message.content)}
-                            className="hover:text-gray-700 dark:hover:text-neutral-300 transition-colors"
-                          >
-                            <Copy className="h-4 w-4" />
-                          </button>
-                        </div>
-                      )}
+                      {message.content}
                     </div>
                   </div>
                 ))}
               </div>
             </ScrollArea>
-            <div className="max-w-3xl mx-auto lg:max-w-4xl xl:max-w-5xl px-4 py-4">
+            <div className="w-full max-w-4xl mx-auto px-4 py-4">
               <form
                 onSubmit={handleSubmit}
                 className="relative flex items-center"
@@ -171,12 +162,16 @@ export default function Component() {
                   placeholder="Type your message here..."
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
-                  className="flex-grow pl-4 pr-10 py-4 h-14 bg-gray-100 dark:bg-neutral-900 border border-gray-300 dark:border-neutral-700 focus-visible:ring-2 focus-visible:ring-gray-300 dark:focus-visible:ring-neutral-700 rounded-2xl"
+                  className="w-full pl-4 pr-12 py-4 h-14 bg-gray-100 dark:bg-neutral-800 border border-gray-300 dark:border-neutral-700 focus-visible:ring-2 focus-visible:ring-gray-300 dark:focus-visible:ring-neutral-700 rounded-2xl"
                 />
-                <button type="submit" className="absolute right-3">
-                  <Send className="h-5 w-5 text-gray-700 dark:text-neutral-300" />
+                <Button
+                  type="submit"
+                  size="icon"
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 bg-black text-white dark:bg-white dark:text-black"
+                >
+                  <Send className="h-5 w-5" />
                   <span className="sr-only">Send</span>
-                </button>
+                </Button>
               </form>
             </div>
           </>
@@ -186,7 +181,7 @@ export default function Component() {
       <AlertDialog>
         <AlertDialogTrigger asChild>
           <Button
-            className="fixed bottom-4 right-4 rounded-full w-12 h-12 bg-black hover:bg-gray-800 dark:bg-white dark:hover:bg-neutral-200 text-white dark:text-black"
+            className="fixed bottom-4 right-4 rounded-full w-12 h-12 bg-black hover:bg-neutral-800 dark:bg-white dark:hover:bg-gray-200 text-white dark:text-black"
             size="icon"
           >
             <Plus className="h-6 w-6" />
@@ -198,7 +193,7 @@ export default function Component() {
             <AlertDialogTitle className="text-gray-900 dark:text-gray-100">
               Start a New Chat?
             </AlertDialogTitle>
-            <AlertDialogDescription className="text-gray-500 dark:text-neutral-400">
+            <AlertDialogDescription className="text-gray-500 dark:text-gray-400">
               Starting a new chat will delete the current conversation. This
               action cannot be undone.
             </AlertDialogDescription>
@@ -214,7 +209,7 @@ export default function Component() {
         </AlertDialogContent>
       </AlertDialog>
 
-      <footer className="py-2 text-center text-xs text-gray-400 dark:text-neutral-500">
+      <footer className="py-2 text-center text-xs text-gray-400 dark:text-gray-500">
         <p>
           © 2024 Hindustan Institute of Technology and Science. All rights
           reserved.
