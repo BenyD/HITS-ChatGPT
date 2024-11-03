@@ -95,8 +95,9 @@ export default function Component() {
           <NextImage
             src={theme === "dark" ? "/hits-dark.svg" : "/hits-light.svg"}
             alt="University Logo"
-            width={128}
-            height={128}
+            width={180}
+            height={180}
+            className="w-32 sm:w-40 md:w-48 lg:w-56 h-auto"
           />
           <ModeToggle />
         </div>
