@@ -167,9 +167,9 @@ export default function Component() {
               </div>
             </ScrollArea>
 
-            <div className="fixed bottom-0 left-0 right-0 z-20 bg-white dark:bg-neutral-900">
+            <div className="fixed bottom-0 left-0 right-0 z-20 bg-white dark:bg-[#09090b]">
               <div className="relative w-full max-w-4xl mx-auto">
-                <div className="absolute -top-20 left-0 right-0 h-20 bg-gradient-to-t from-white/95 via-white/70 to-transparent dark:from-neutral-900/95 dark:via-neutral-900/70 dark:to-transparent" />
+                <div className="absolute -top-20 left-0 right-0 h-20 bg-gradient-to-t from-white via-white/50 to-transparent dark:from-[#09090b] dark:via-[#09090b]/50 dark:to-transparent" />
 
                 <div className="px-4">
                   <div className="flex items-center justify-center gap-2 py-4">
