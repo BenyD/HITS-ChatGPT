@@ -42,6 +42,10 @@ export default function Component() {
     e.preventDefault();
     if (!input.trim()) return;
 
+    if (navigator.vibrate) {
+      navigator.vibrate(50); // Add subtle haptic feedback for mobile
+    }
+
     setMessages((prev) => [...prev, { role: "user", content: input }]);
     setIsExpanded(true);
     setIsLoading(true);
@@ -91,8 +95,8 @@ export default function Component() {
           <NextImage
             src={theme === "dark" ? "/hits-dark.svg" : "/hits-light.svg"}
             alt="University Logo"
-            width={64}
-            height={64}
+            width={128}
+            height={128}
           />
           <ModeToggle />
         </div>
@@ -111,7 +115,7 @@ export default function Component() {
                   placeholder="Type your message here..."
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
-                  className="flex-grow pl-4 pr-12 py-4 h-14 bg-gray-100 dark:bg-neutral-800 border border-gray-300 dark:border-neutral-700 focus-visible:ring-2 focus-visible:ring-gray-300 dark:focus-visible:ring-neutral-700 rounded-2xl"
+                  className="flex-grow pl-3 pr-10 py-3 h-12 bg-gray-100 dark:bg-neutral-800 border border-gray-300 dark:border-neutral-700 focus-visible:ring-2 focus-visible:ring-gray-300 dark:focus-visible:ring-neutral-700 rounded-2xl text-sm"
                 />
                 <Button
                   type="submit"
@@ -120,9 +124,9 @@ export default function Component() {
                   className="absolute right-3 top-1/2 transform -translate-y-1/2 bg-black text-white dark:bg-white dark:text-black rounded-full"
                 >
                   {isLoading ? (
-                    <Loader className="h-5 w-5 animate-spin" />
+                    <Loader className="h-4 w-4 animate-spin" />
                   ) : (
-                    <Send className="h-5 w-5" />
+                    <Send className="h-4 w-4" />
                   )}
                   <span className="sr-only">Send</span>
                 </Button>
@@ -133,7 +137,7 @@ export default function Component() {
         ) : (
           <>
             <ScrollArea className="flex-1 w-full max-w-4xl mx-auto px-4 py-6">
-              <div className="space-y-4 pb-20">
+              <div className="space-y-2 pb-20 leading-relaxed">
                 {messages.map((message, index) => (
                   <div
                     key={index}
@@ -146,7 +150,7 @@ export default function Component() {
                         message.role === "user"
                           ? "bg-gray-100 dark:bg-neutral-800"
                           : "bg-neutral-200 dark:bg-neutral-700"
-                      } p-4 rounded-lg max-w-[90%]`}
+                      } p-3 rounded-lg max-w-[85%] text-sm`}
                     >
                       {message.content}
                     </div>
@@ -154,7 +158,7 @@ export default function Component() {
                 ))}
                 {isLoading && (
                   <div className="text-center mt-2">
-                    <Loader className="h-6 w-6 animate-spin" />
+                    <Loader className="h-5 w-5 animate-spin" />
                   </div>
                 )}
               </div>
@@ -171,18 +175,18 @@ export default function Component() {
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
                   disabled={isLoading}
-                  className="w-full pl-4 pr-12 py-4 h-14 bg-gray-100 dark:bg-neutral-800 border border-gray-300 dark:border-neutral-700 focus-visible:ring-2 focus-visible:ring-gray-300 dark:focus-visible:ring-neutral-700 rounded-2xl"
+                  className="w-full pl-3 pr-10 py-3 h-12 bg-gray-100 dark:bg-neutral-800 border border-gray-300 dark:border-neutral-700 focus-visible:ring-2 focus-visible:ring-gray-300 dark:focus-visible:ring-neutral-700 rounded-2xl text-sm"
                 />
                 <Button
                   type="submit"
                   size="icon"
                   disabled={isLoading}
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 bg-black text-white dark:bg-white dark:text-black"
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 bg-black text-white dark:bg-white dark:text-black rounded-full"
                 >
                   {isLoading ? (
-                    <Loader className="h-5 w-5 animate-spin" />
+                    <Loader className="h-4 w-4 animate-spin" />
                   ) : (
-                    <Send className="h-5 w-5" />
+                    <Send className="h-4 w-4" />
                   )}
                   <span className="sr-only">Send</span>
                 </Button>
@@ -237,7 +241,7 @@ function Footer() {
             Developed by Beny Dishon K
           </span>
         </HoverCardTrigger>
-        <HoverCardContent className="w-80">
+        <HoverCardContent className="w-72 sm:w-80 p-3">
           <div className="flex space-x-4">
             <Avatar>
               <AvatarImage src="https://media.licdn.com/dms/image/v2/D5603AQHb4iGoBjuuwA/profile-displayphoto-shrink_400_400/profile-displayphoto-shrink_400_400/0/1728841903516?e=1736380800&v=beta&t=2FC3oxpU2FT0DquNlTt9U_k0K6Wa39vJsIsLtxULbyA" />
