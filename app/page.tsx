@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -19,6 +19,12 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from "@/components/ui/hover-card";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 type Message = {
   role: "user" | "bot";
@@ -30,19 +36,7 @@ export default function Component() {
   const [input, setInput] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isExpanded, setIsExpanded] = useState<boolean>(false);
-  const { theme, systemTheme } = useTheme();
-
-  // Determine the correct logo based on theme and system preference
-  const [logoSrc, setLogoSrc] = useState<string>(
-    theme === "dark" || (theme === "system" && systemTheme === "dark")
-      ? "/hits-dark.svg"
-      : "/hits-light.svg"
-  );
-
-  useEffect(() => {
-    const currentTheme = theme === "system" ? systemTheme : theme;
-    setLogoSrc(currentTheme === "dark" ? "/hits-dark.svg" : "/hits-light.svg");
-  }, [theme, systemTheme]);
+  const { theme } = useTheme();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -61,6 +55,7 @@ export default function Component() {
       });
 
       const data = await response.json();
+
       setMessages((prev) => [
         ...prev,
         {
@@ -92,16 +87,14 @@ export default function Component() {
   return (
     <div className="flex flex-col min-h-screen">
       <header className="sticky top-0 z-50 bg-white dark:bg-neutral-900 border-b border-gray-200 dark:border-neutral-700">
-        <div className="flex justify-center items-center px-4 py-3 max-w-[1920px] mx-auto">
+        <div className="flex justify-between items-center px-4 py-3 max-w-[1920px] mx-auto">
           <NextImage
-            src={logoSrc}
+            src={theme === "dark" ? "/hits-dark.svg" : "/hits-light.svg"}
             alt="University Logo"
-            width={256}
-            height={256}
+            width={64}
+            height={64}
           />
-          <div className="absolute right-4">
-            <ModeToggle />
-          </div>
+          <ModeToggle />
         </div>
       </header>
 
@@ -135,22 +128,7 @@ export default function Component() {
                 </Button>
               </div>
             </form>
-            <footer className="py-2 text-center text-xs text-gray-400 dark:text-gray-500">
-              <p>
-                © 2024 Hindustan Institute of Technology and Science. All rights
-                reserved.
-                <br />
-                Developed by{" "}
-                <a
-                  href="https://beny.one"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-gray-500 hover:text-gray-600 dark:hover:text-gray-400"
-                >
-                  Beny Dishon K
-                </a>
-              </p>
-            </footer>
+            <Footer />
           </div>
         ) : (
           <>
@@ -245,5 +223,39 @@ export default function Component() {
         )}
       </main>
     </div>
+  );
+}
+
+function Footer() {
+  return (
+    <footer className="py-2 text-center text-xs text-gray-400 dark:text-gray-500">
+      © 2024 Hindustan Institute of Technology and Science. All rights reserved.{" "}
+      <br />
+      <HoverCard>
+        <HoverCardTrigger asChild>
+          <span className="text-gray-600 hover:text-gray-800 dark:text-gray-300 dark:hover:text-gray-200 cursor-pointer font-medium">
+            Developed by Beny Dishon K
+          </span>
+        </HoverCardTrigger>
+        <HoverCardContent className="w-80">
+          <div className="flex space-x-4">
+            <Avatar>
+              <AvatarImage src="https://media.licdn.com/dms/image/v2/D5603AQHb4iGoBjuuwA/profile-displayphoto-shrink_400_400/profile-displayphoto-shrink_400_400/0/1728841903516?e=1736380800&v=beta&t=2FC3oxpU2FT0DquNlTt9U_k0K6Wa39vJsIsLtxULbyA" />
+              <AvatarFallback>BD</AvatarFallback>
+            </Avatar>
+            <div className="space-y-1 text-left">
+              <h4 className="text-sm font-semibold text-gray-800 dark:text-gray-100">
+                Beny Dishon K
+              </h4>
+              <p className="text-sm text-gray-600 dark:text-gray-400">
+                Software Engineer and Full Stack Developer. Passionate about
+                innovation and learning. Actively building solutions that
+                enhance lives worldwide.
+              </p>
+            </div>
+          </div>
+        </HoverCardContent>
+      </HoverCard>
+    </footer>
   );
 }
