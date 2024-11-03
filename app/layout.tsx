@@ -17,8 +17,9 @@ const geistMono = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "University Chat App",
-  description: "University-focused chat application using AI",
+  title: "HITS Chat App",
+  description:
+    "AI powered chatting application for Hindustan Institute of Technology and Science developed by Beny Dishon.",
 };
 
 export default function RootLayout({

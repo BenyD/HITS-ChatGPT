@@ -131,6 +131,16 @@ export default function Component() {
               <p>
                 © 2024 Hindustan Institute of Technology and Science. All rights
                 reserved.
+                <br />
+                Developed by{" "}
+                <a
+                  href="https://beny.one"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-gray-500 hover:text-gray-600 dark:hover:text-gray-400"
+                >
+                  Beny Dishon K
+                </a>
               </p>
             </footer>
           </div>
