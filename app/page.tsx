@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -30,20 +30,30 @@ export default function Component() {
   const [input, setInput] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isExpanded, setIsExpanded] = useState<boolean>(false);
-  const { theme } = useTheme();
+  const { theme, systemTheme } = useTheme();
+
+  // Determine the correct logo based on theme and system preference
+  const [logoSrc, setLogoSrc] = useState<string>(
+    theme === "dark" || (theme === "system" && systemTheme === "dark")
+      ? "/hits-dark.svg"
+      : "/hits-light.svg"
+  );
+
+  useEffect(() => {
+    const currentTheme = theme === "system" ? systemTheme : theme;
+    setLogoSrc(currentTheme === "dark" ? "/hits-dark.svg" : "/hits-light.svg");
+  }, [theme, systemTheme]);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!input.trim()) return; // Prevent empty submissions
+    if (!input.trim()) return;
 
-    // Add user message and show loading spinner
     setMessages((prev) => [...prev, { role: "user", content: input }]);
     setIsExpanded(true);
     setIsLoading(true);
     setInput("");
 
     try {
-      // Fetch response from API
       const response = await fetch("/api/ask", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -51,8 +61,6 @@ export default function Component() {
       });
 
       const data = await response.json();
-
-      // Handle response and display message from bot
       setMessages((prev) => [
         ...prev,
         {
@@ -86,7 +94,7 @@ export default function Component() {
       <header className="sticky top-0 z-50 bg-white dark:bg-neutral-900 border-b border-gray-200 dark:border-neutral-700">
         <div className="flex justify-center items-center px-4 py-3 max-w-[1920px] mx-auto">
           <NextImage
-            src={theme === "dark" ? "/hits-dark.svg" : "/hits-light.svg"}
+            src={logoSrc}
             alt="University Logo"
             width={256}
             height={256}
@@ -115,7 +123,7 @@ export default function Component() {
                 <Button
                   type="submit"
                   size="icon"
-                  disabled={isLoading} // Disable button while loading
+                  disabled={isLoading}
                   className="absolute right-3 top-1/2 transform -translate-y-1/2 bg-black text-white dark:bg-white dark:text-black rounded-full"
                 >
                   {isLoading ? (
