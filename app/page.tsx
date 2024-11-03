@@ -137,21 +137,21 @@ export default function Component() {
           </div>
         ) : (
           <>
-            <ScrollArea className="flex-1 w-full max-w-4xl mx-auto px-4 py-6">
-              <div className="space-y-2 pb-20 leading-relaxed">
+            <ScrollArea className="flex-1 w-full max-w-4xl mx-auto px-4 py-6 mb-24">
+              <div className="space-y-2 leading-relaxed pr-2">
                 {messages.map((message, index) => (
                   <div
                     key={index}
                     className={`${
                       message.role === "user" ? "text-right" : "text-left"
-                    }`}
+                    } w-full overflow-hidden`}
                   >
                     <div
                       className={`inline-block ${
                         message.role === "user"
                           ? "bg-gray-100 dark:bg-neutral-800"
                           : "bg-neutral-200 dark:bg-neutral-700"
-                      } p-3 rounded-lg max-w-[85%] text-sm`}
+                      } p-3 rounded-lg max-w-[85%] text-sm whitespace-pre-wrap overflow-hidden`}
                     >
                       {message.content}
                     </div>
@@ -165,64 +165,72 @@ export default function Component() {
               </div>
             </ScrollArea>
 
-            <div className="flex w-full max-w-4xl mx-auto px-4 py-4 items-center justify-center gap-2 fixed bottom-0">
-              <form
-                onSubmit={handleSubmit}
-                className="relative flex-grow flex items-center"
-              >
-                <Input
-                  type="text"
-                  placeholder="Type your message here..."
-                  value={input}
-                  onChange={(e) => setInput(e.target.value)}
-                  disabled={isLoading}
-                  className="w-full pl-3 pr-10 py-3 h-12 bg-gray-100 dark:bg-neutral-800 border border-gray-300 dark:border-neutral-700 focus-visible:ring-2 focus-visible:ring-gray-300 dark:focus-visible:ring-neutral-700 rounded-2xl text-sm"
-                />
-                <Button
-                  type="submit"
-                  size="icon"
-                  disabled={isLoading}
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 bg-black text-white dark:bg-white dark:text-black rounded-full"
-                >
-                  {isLoading ? (
-                    <Loader className="h-4 w-4 animate-spin" />
-                  ) : (
-                    <Send className="h-4 w-4" />
-                  )}
-                  <span className="sr-only">Send</span>
-                </Button>
-              </form>
+            <div className="fixed bottom-0 left-0 right-0 z-20">
+              <div className="relative">
+                <div className="absolute -top-20 left-0 right-0 h-20 bg-gradient-to-t from-white/95 via-white/70 to-transparent dark:from-neutral-900/95 dark:via-neutral-900/70 dark:to-transparent" />
+                
+                <div className="max-w-4xl mx-auto px-4">
+                  <div className="flex items-center justify-center gap-2 py-4 bg-white dark:bg-neutral-900">
+                    <form
+                      onSubmit={handleSubmit}
+                      className="relative flex-grow flex items-center max-w-[calc(100%-3.5rem)]"
+                    >
+                      <Input
+                        type="text"
+                        placeholder="Type your message here..."
+                        value={input}
+                        onChange={(e) => setInput(e.target.value)}
+                        disabled={isLoading}
+                        className="w-full pl-3 pr-10 py-3 h-12 bg-gray-100 dark:bg-neutral-800 border border-gray-300 dark:border-neutral-700 focus-visible:ring-2 focus-visible:ring-gray-300 dark:focus-visible:ring-neutral-700 rounded-2xl text-sm truncate"
+                      />
+                      <Button
+                        type="submit"
+                        size="icon"
+                        disabled={isLoading}
+                        className="absolute right-3 top-1/2 transform -translate-y-1/2 bg-black text-white dark:bg-white dark:text-black rounded-full"
+                      >
+                        {isLoading ? (
+                          <Loader className="h-4 w-4 animate-spin" />
+                        ) : (
+                          <Send className="h-4 w-4" />
+                        )}
+                        <span className="sr-only">Send</span>
+                      </Button>
+                    </form>
 
-              <AlertDialog>
-                <AlertDialogTrigger asChild>
-                  <Button
-                    className="w-12 h-12 bg-black hover:bg-neutral-800 dark:bg-white dark:hover:bg-gray-200 text-white dark:text-black rounded-full"
-                    size="icon"
-                  >
-                    <Plus className="h-6 w-6" />
-                    <span className="sr-only">New Chat</span>
-                  </Button>
-                </AlertDialogTrigger>
-                <AlertDialogContent className="bg-white dark:bg-neutral-900 border border-gray-200 dark:border-neutral-700">
-                  <AlertDialogHeader>
-                    <AlertDialogTitle className="text-gray-900 dark:text-gray-100">
-                      Start a New Chat?
-                    </AlertDialogTitle>
-                    <AlertDialogDescription className="text-gray-500 dark:text-gray-400">
-                      Starting a new chat will delete the current conversation.
-                      This action cannot be undone.
-                    </AlertDialogDescription>
-                  </AlertDialogHeader>
-                  <AlertDialogFooter>
-                    <AlertDialogCancel className="border border-gray-200 dark:border-neutral-700">
-                      Cancel
-                    </AlertDialogCancel>
-                    <AlertDialogAction onClick={startNewChat}>
-                      Continue
-                    </AlertDialogAction>
-                  </AlertDialogFooter>
-                </AlertDialogContent>
-              </AlertDialog>
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <Button
+                          className="w-12 h-12 bg-black hover:bg-neutral-800 dark:bg-white dark:hover:bg-gray-200 text-white dark:text-black rounded-full"
+                          size="icon"
+                        >
+                          <Plus className="h-6 w-6" />
+                          <span className="sr-only">New Chat</span>
+                        </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent className="bg-white dark:bg-neutral-900 border border-gray-200 dark:border-neutral-700">
+                        <AlertDialogHeader>
+                          <AlertDialogTitle className="text-gray-900 dark:text-gray-100">
+                            Start a New Chat?
+                          </AlertDialogTitle>
+                          <AlertDialogDescription className="text-gray-500 dark:text-gray-400">
+                            Starting a new chat will delete the current
+                            conversation. This action cannot be undone.
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel className="border border-gray-200 dark:border-neutral-700">
+                            Cancel
+                          </AlertDialogCancel>
+                          <AlertDialogAction onClick={startNewChat}>
+                            Continue
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
+                  </div>
+                </div>
+              </div>
             </div>
           </>
         )}
