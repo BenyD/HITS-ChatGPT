@@ -36,7 +36,7 @@ export default function Component() {
   const [input, setInput] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isExpanded, setIsExpanded] = useState<boolean>(false);
-  const { theme } = useTheme();
+  const { resolvedTheme } = useTheme();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -93,7 +93,9 @@ export default function Component() {
       <header className="sticky top-0 z-50 bg-white dark:bg-neutral-900 border-b border-gray-200 dark:border-neutral-700">
         <div className="flex justify-between items-center px-4 py-3 max-w-[1920px] mx-auto">
           <NextImage
-            src={theme === "dark" ? "/hits-dark.svg" : "/hits-light.svg"}
+            src={
+              resolvedTheme === "dark" ? "/hits-dark.svg" : "/hits-light.svg"
+            }
             alt="University Logo"
             width={180}
             height={180}
@@ -165,12 +167,12 @@ export default function Component() {
               </div>
             </ScrollArea>
 
-            <div className="fixed bottom-0 left-0 right-0 z-20">
-              <div className="relative">
+            <div className="fixed bottom-0 left-0 right-0 z-20 bg-white dark:bg-neutral-900">
+              <div className="relative w-full max-w-4xl mx-auto">
                 <div className="absolute -top-20 left-0 right-0 h-20 bg-gradient-to-t from-white/95 via-white/70 to-transparent dark:from-neutral-900/95 dark:via-neutral-900/70 dark:to-transparent" />
-                
-                <div className="max-w-4xl mx-auto px-4">
-                  <div className="flex items-center justify-center gap-2 py-4 bg-white dark:bg-neutral-900">
+
+                <div className="px-4">
+                  <div className="flex items-center justify-center gap-2 py-4">
                     <form
                       onSubmit={handleSubmit}
                       className="relative flex-grow flex items-center max-w-[calc(100%-3.5rem)]"
