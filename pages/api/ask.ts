@@ -2,20 +2,27 @@ import { NextApiRequest, NextApiResponse } from "next";
 import { MongoClient } from "mongodb";
 import { HfInference } from "@huggingface/inference";
 
-const hf = new HfInference(process.env.HF_API_TOKEN as string);
-const uri = process.env.MONGODB_URI as string;
+// Initialize Hugging Face Inference API
+const hf = new HfInference(process.env.HF_API_TOKEN!);
 
-let cachedDb: MongoClient | null = null;
+// MongoDB connection URI
+const MONGODB_URI = process.env.MONGODB_URI!;
+const MONGODB_DB = "UniversityDB"; // Database name
+const MONGODB_COLLECTION = "contexts"; // Collection name
 
-async function getDatabase() {
-  if (cachedDb) return cachedDb.db("UniversityDB");
-
-  const client = new MongoClient(uri);
-  await client.connect();
-  cachedDb = client;
-  return client.db("UniversityDB");
+// Function to flatten embedding responses
+function flattenEmbedding(embedding: number | number[] | number[][]): number[] {
+  if (Array.isArray(embedding)) {
+    if (Array.isArray(embedding[0])) {
+      // Handles the case of nested arrays
+      return embedding[0] as number[];
+    }
+    return embedding as number[];
+  }
+  return [embedding];
 }
 
+// Function to calculate cosine similarity
 function cosineSimilarity(vectorA: number[], vectorB: number[]): number {
   const dotProduct = vectorA.reduce((sum, a, idx) => sum + a * vectorB[idx], 0);
   const magnitudeA = Math.sqrt(
@@ -24,148 +31,68 @@ function cosineSimilarity(vectorA: number[], vectorB: number[]): number {
   const magnitudeB = Math.sqrt(
     vectorB.reduce((sum, val) => sum + val * val, 0)
   );
-  return magnitudeA && magnitudeB ? dotProduct / (magnitudeA * magnitudeB) : 0;
+  return dotProduct / (magnitudeA * magnitudeB);
 }
 
-async function getEmbedding(question: string): Promise<number[]> {
-  const embeddingResult = await hf.featureExtraction({
-    model: "sentence-transformers/all-MiniLM-L6-v2",
-    inputs: question,
-  });
-  return embeddingResult as number[];
-}
-
-async function findSimilarContext(question: string) {
-  try {
-    const db = await getDatabase();
-    const collection = db.collection("contexts");
-    const questionEmbedding = await getEmbedding(question);
-    const contexts = await collection.find().toArray();
-
-    let bestMatch = null;
-    let highestScore = 0;
-
-    for (const context of contexts) {
-      const similarity = cosineSimilarity(questionEmbedding, context.embedding);
-      if (similarity > highestScore) {
-        highestScore = similarity;
-        bestMatch = context;
-      }
-    }
-
-    console.log("Best similarity score:", highestScore);
-    console.log("Matched Context:", bestMatch?.context || "No context found");
-
-    return highestScore > 0.3 ? bestMatch?.context : null;
-  } catch (error) {
-    console.error("Error finding similar context:", error);
-    return null;
-  }
-}
-
-function cleanOutput(text: string): string {
-  return text.replace(/(^.*Context:|Answer:|\\n)/g, "").trim();
-}
-
+// API handler
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
   if (req.method !== "POST") {
-    return res.status(405).json({ error: "Method not allowed" });
+    return res.status(405).json({ error: "Only POST requests are allowed." });
   }
 
   const { question } = req.body;
-  console.log("Received question:", question);
+
+  if (!question) {
+    return res.status(400).json({ error: "Question is required." });
+  }
 
   try {
-    const context = await findSimilarContext(question);
+    // Get question embedding from Hugging Face
+    const questionEmbeddingResponse = await hf.featureExtraction({
+      model: "sentence-transformers/all-MiniLM-L6-v2",
+      inputs: question,
+    });
 
-    if (!context) {
-      console.warn("No relevant context found for question:", question);
+    const questionEmbedding = flattenEmbedding(
+      questionEmbeddingResponse as number[] | number[][]
+    );
+
+    // Connect to MongoDB
+    const client = new MongoClient(MONGODB_URI);
+    await client.connect();
+    const collection = client.db(MONGODB_DB).collection(MONGODB_COLLECTION);
+
+    // Fetch all stored contexts
+    const contexts = await collection.find({}).toArray();
+
+    // Calculate cosine similarity for each context
+    const similarities = contexts.map((doc) => {
+      const contextEmbedding = flattenEmbedding(doc.embedding);
+      const similarity = cosineSimilarity(questionEmbedding, contextEmbedding);
+      return { context: doc.context, similarity };
+    });
+
+    // Find the most similar context
+    const bestMatch = similarities.sort(
+      (a, b) => b.similarity - a.similarity
+    )[0];
+
+    await client.close();
+
+    if (bestMatch.similarity < 0.7) {
       return res.status(200).json({
-        answer:
-          "I'm sorry, I couldn't find relevant information. Please try asking differently or check the handbook.",
+        answer: "No relevant context found for your question.",
       });
     }
 
-    console.log("Using context:", context);
-
-    let response;
-    const maxAttempts = 3;
-
-    for (let attempt = 0; attempt < maxAttempts; attempt++) {
-      response = await fetch(
-        "https://api-inference.huggingface.co/models/BenyD/FLAN-T5-Small-College-Chat",
-        {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${process.env.HF_API_TOKEN}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            inputs: `Question: ${question}. Context: ${context}. Answer concisely.`,
-            parameters: {
-              max_new_tokens: 100,
-              temperature: 0.7,
-              top_p: 0.9,
-            },
-          }),
-        }
-      );
-
-      const data = await response.json();
-      console.log("Model response data:", data);
-
-      if (data.error) {
-        if (data.error.includes("currently loading")) {
-          console.log(
-            `Model is loading. Retrying in 5 seconds... (Attempt ${
-              attempt + 1
-            }/${maxAttempts})`
-          );
-          await new Promise((resolve) => setTimeout(resolve, 5000));
-          continue;
-        } else {
-          console.error("Unexpected response error:", data.error);
-          return res.status(200).json({
-            answer:
-              "I'm sorry, I couldn't retrieve a detailed answer. Please try again later.",
-          });
-        }
-      } else if (data[0]?.generated_text) {
-        let answer = cleanOutput(data[0].generated_text);
-
-        // Fallback to context if answer seems too generic or unrelated
-        if (
-          !answer ||
-          answer.length < 5 ||
-          !answer.includes(context.split(",")[0])
-        ) {
-          console.log("Using fallback answer based on context.");
-          answer = context;
-        }
-
-        console.log("Final Answer:", answer);
-        return res.status(200).json({ answer });
-      } else {
-        console.log("Unexpected response format:", data);
-        return res.status(200).json({
-          answer:
-            "I'm sorry, I couldn't retrieve a detailed answer. Please try again later.",
-        });
-      }
-    }
-
-    console.error("Exceeded max retry attempts due to model loading issues.");
-    return res.status(200).json({
-      answer:
-        "I'm sorry, the model is taking longer than expected to load. Please try again later.",
-    });
+    return res.status(200).json({ answer: bestMatch.context });
   } catch (error) {
-    console.error("Error calling the Hugging Face API or MongoDB:", error);
-    return res.status(500).json({
-      answer: "An error occurred. Please try again later.",
-    });
+    console.error("Error handling question:", error);
+    return res
+      .status(500)
+      .json({ error: "An error occurred while processing the request." });
   }
 }
