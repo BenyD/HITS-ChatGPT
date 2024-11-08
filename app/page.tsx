@@ -248,9 +248,14 @@ function Footer() {
       <br />
       <HoverCard>
         <HoverCardTrigger asChild>
-          <span className="text-gray-600 hover:text-gray-800 dark:text-gray-300 dark:hover:text-gray-200 cursor-pointer font-medium">
+          <a
+            href="https://beny.one"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-gray-600 hover:text-gray-800 dark:text-gray-300 dark:hover:text-gray-200 cursor-pointer font-medium"
+          >
             Developed by Beny Dishon K
-          </span>
+          </a>
         </HoverCardTrigger>
         <HoverCardContent className="w-72 sm:w-80 p-3">
           <div className="flex space-x-4">

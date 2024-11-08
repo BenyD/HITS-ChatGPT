@@ -17,21 +17,21 @@ const geistMono = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "HITS Chat App",
+  title: "HITS ChatGPT",
   description:
     "AI powered chatting application for Hindustan Institute of Technology and Science developed by Beny Dishon.",
   openGraph: {
-    title: "HITS Chat App",
+    title: "HITS ChatGPT",
     description:
       "AI powered chatting application for Hindustan Institute of Technology and Science developed by Beny Dishon.",
     url: "https://hits.beny.one/",
-    siteName: "HITS Chat App",
+    siteName: "HITS ChatGPT",
     images: [
       {
         url: "/android-chrome-192x192.png",
         width: 192,
         height: 192,
-        alt: "HITS Chat App Logo",
+        alt: "HITS ChatGPT Logo",
       },
     ],
     locale: "en_US",
@@ -39,7 +39,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "HITS Chat App",
+    title: "HITS ChatGPT",
     description:
       "AI powered chatting application for Hindustan Institute of Technology and Science developed by Beny Dishon.",
     images: ["/android-chrome-192x192.png"],
